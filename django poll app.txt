@@ -1,0 +1,55 @@
+"""poll_app URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/4.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+
+import poll_site.views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', poll_site.views.index),
+    path('vote/', poll_site.views.vote)
+]
+
+
+models.py
+
+from django.db import models
+
+
+class Language(models.Model):
+    name = models.CharField(max_length=255)
+    votes = models.IntegerField(default=0)
+
+
+views.py
+
+
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect, render
+
+from poll_site.models import Language
+
+def index(request:HttpRequest):
+    languages = Language.objects.all()
+    return HttpResponse(render(request, template_name='poll_site/index.html', context={'languages': languages}))
+
+def vote(request:HttpRequest):
+    id = request.POST.get('language')
+    language = Language.objects.get(id=id)
+    language.votes = language.votes + 1
+    language.save()
+    return redirect('/')
