@@ -1,0 +1,73 @@
+FORMS.py
+
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+ 
+class SignUpForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'password1', 'password2', )
+
+
+URLS.py
+
+from django.contrib import admin
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path('login', views.login_view),
+    path('signup', views.signup),
+]
+
+VIEWS.py
+
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect, render
+from django.contrib.auth import authenticate, login
+from login.forms import SignUpForm
+
+# Create your views here.
+def login_view(request:HttpRequest):
+    return HttpResponse("login")
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()  
+            # load the profile instance created by the signal
+            user.save()
+            raw_password = form.cleaned_data.get('password1')
+
+            # login user after signing up
+            user = authenticate(username=user.username, password=raw_password)
+            login(request, user)
+
+            # redirect user to home page
+            return redirect('/')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+base.html
+
+{% block content %}{% endblock content %}
+
+
+
+SIGNUP.html
+
+{% extends 'base.html' %} {% block content %}
+Sign up
+{% csrf_token %} {% for field in form %}
+{{ field.label_tag }}
+{{ field }} {% if field.help_text %} {{ field.help_text }} {% endif %} {% for error in field.errors %}
+
+{{ error }}
+
+{% endfor %}
+{% endfor %} Sign up
+{% endblock content %}
