@@ -1,0 +1,11 @@
+var fs = require('fs'); var file1 ='input.txt'; var file2 = 'output.txt'; 
+ function fileValidation() 
+{     fs.open(file1,'r',function(err,fd){         if(err)             {                 return console.error(err); 
+            }             var buffer = new Buffer.alloc(30);             fs.read(fd,buffer,0,buffer.length,0,function(err,bytes){                 if(err) throw err;                 console.log(buffer.toString()); 
+            });       fs.appendFile(file2,buffer,function(err){         if(err) throw err;         console.log("data saved !!!");         fs.close(fd,function(err) 
+        {             if(err) throw err;}); 
+        });      
+    }); 
+}  
+fileValidation(); 
+ 

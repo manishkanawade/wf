@@ -1,0 +1,7 @@
+var mysql= require('mysql'); var con= mysql.createConnection({     host: "localhost",     user: "root", 
+    password: "satara@123" 
+}); con.connect(function(err){     if (err) throw err;     console.log("Connected!!");     con.query("create DATABASE mydb",function(err,result){         if (err) throw err;         console.log("Database created"); 
+         
+    }); 
+}); 
+ 
